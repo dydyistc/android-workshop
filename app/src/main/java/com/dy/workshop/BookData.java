@@ -41,8 +41,9 @@ public class BookData {
     for (int i = 0; i < jsonArray.length(); i++) {
       JSONObject object = (JSONObject) jsonArray.opt(i);
       books.add(
-          new Book(object.optString("title"),
-              object.optString("name"),
+          new Book(
+              object.optString("image"),
+              object.optString("title"),
               object.optJSONArray("author").toString(),
               object.optString("publisher"),
               object.optString("pubdate"),

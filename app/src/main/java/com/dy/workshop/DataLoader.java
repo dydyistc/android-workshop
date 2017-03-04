@@ -1,46 +1,47 @@
 package com.dy.workshop;
 
 
-import static android.util.Xml.Encoding.UTF_8;
-
-import android.content.Context;
-import android.util.Log;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 public class DataLoader {
   private static final String TAG = DataLoader.class.toString();
 
-  public final static JSONObject loadData(Context context) {
-    JSONObject jsonObject = new JSONObject();
-
-    InputStream inputStream = context.getResources().openRawResource(R.raw.data);
+  public final static JSONObject loadData(String urlString) {
+    StringBuilder contentBuilder = new StringBuilder();
+    String line = null;
 
     try {
-      int size = inputStream.available();
-      byte[] buffer = new byte[size];
-      inputStream.read(buffer);
-      inputStream.close();
-      jsonObject = new JSONObject(new String(buffer, UTF_8.toString()));
+      URL url = new URL(urlString);
+      HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+      connection.setRequestMethod("GET");
+      connection.setReadTimeout(15000);
+      connection.setConnectTimeout(15000);
+      connection.connect();
+
+      BufferedReader rd = new BufferedReader(
+          new InputStreamReader(connection.getInputStream())
+      );
+
+      while ((line = rd.readLine()) != null) {
+        contentBuilder.append(line);
+      }
+
+      rd.close();
+      connection.disconnect();
+
+      return new JSONObject(contentBuilder.toString());
+
     } catch (IOException | JSONException e) {
       e.printStackTrace();
-      Log.e(TAG, e.getLocalizedMessage(), e);
-    } finally {
-      if (inputStream != null) {
-        try {
-          inputStream.close();
-        } catch (IOException e) {
-          e.printStackTrace();
-        }
-      }
     }
-
-    return jsonObject;
+    return null;
   }
-
 
 }
