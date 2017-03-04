@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
@@ -31,9 +32,18 @@ public class MainActivity extends AppCompatActivity {
       public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
         View view = LayoutInflater.from(getContext()).inflate(R.layout.list_item_book, parent, false);
         ImageView bookImage = (ImageView) view.findViewById(R.id.thumbnail);
-
         TextView bookTitle = (TextView) view.findViewById(R.id.title);
-        bookTitle.setText(getItem(position).getTitle());
+        TextView bookSummary = (TextView) view.findViewById(R.id.summary);
+        TextView bookInformation = (TextView) view.findViewById(R.id.information);
+        TextView ratingVal = (TextView) view.findViewById(R.id.ratingValue);
+        RatingBar ratingBar = (RatingBar) view.findViewById(R.id.rating);
+
+        Book book = getItem(position);
+        bookTitle.setText(book.getTitle());
+        bookSummary.setText(book.getSummary());
+        bookInformation.setText(book.getInformation());
+        ratingBar.setRating((float) book.getRating() / 2);
+        ratingVal.setText(String.valueOf(book.getRating()));
 
         return view;
       }
