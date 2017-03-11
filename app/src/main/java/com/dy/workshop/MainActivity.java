@@ -7,11 +7,12 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
-
+  private static final String TAG = "MainActivity";
   private static final String DATA_URL = "https://api.douban.com/v2/book/search?tag=%s&count=%d&start=%d";
   private static final String DATA_TAG = "IT";
   private static final int DATA_PER_PAGE = 20;
@@ -20,9 +21,12 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
   private RecyclerView mRecyclerView;
   private BookListAdapter mAdapter;
 
-  private RecyclerView.LayoutManager mLayoutManager;
+  private LinearLayoutManager mLayoutManager;
   private SwipeRefreshLayout mRefreshLayout;
   private boolean isLoading;
+  private int visibleItemCount;
+  private int totalItemCount;
+  private int pastVisibleItems;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +45,42 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     mRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
     mRefreshLayout.setOnRefreshListener(this);
 
+    mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+      @Override
+      public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+        if (dy > 0) {
+          visibleItemCount = mLayoutManager.getChildCount();
+          totalItemCount = mLayoutManager.getItemCount();
+          pastVisibleItems = mLayoutManager.findFirstVisibleItemPosition();
+          if (!isLoading) {
+            if ((visibleItemCount + pastVisibleItems) >= totalItemCount) {
+              isLoading = false;
+              loadMoreData();
+            }
+          }
+        }
+      }
+    });
+
     doRefresh();
+  }
+
+  private void loadMoreData() {
+    Log.d(TAG, "Last Item Wow !");
+    new LoadDataTask() {
+      @Override
+      protected void onPreExecute() {
+        super.onPreExecute();
+        isLoading = true;
+      }
+
+      @Override
+      protected void onPostExecute(BookData bookData) {
+        super.onPostExecute(bookData);
+        isLoading = false;
+        mAdapter.addAll(bookData.getBooks());
+      }
+    }.execute(getDataUrl(mAdapter.getItemCount()));
   }
 
   @Override
