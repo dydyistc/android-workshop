@@ -38,4 +38,7 @@ public class BookData {
     return books;
   }
 
+  public static BookData from(JSONObject jsonObject) {
+    return new BookData(jsonObject);
+  }
 }
