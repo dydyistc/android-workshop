@@ -22,32 +22,6 @@ public class Book {
     this.rating = rating;
   }
 
-
-  public void setTitle(String title) {
-    this.title = title;
-  }
-
-
-  public void setAuthor(String author) {
-    this.author = author;
-  }
-
-  public void setPublisher(String publisher) {
-    this.publisher = publisher;
-  }
-
-  public void setPublishDate(String publishDate) {
-    this.publishDate = publishDate;
-  }
-
-  public void setSummary(String summary) {
-    this.summary = summary;
-  }
-
-  public void setRating(double rating) {
-    this.rating = rating;
-  }
-
   public String getTitle() {
     return title;
   }
@@ -81,7 +55,4 @@ public class Book {
     return image;
   }
 
-  public void setImage(String image) {
-    this.image = image;
-  }
 }

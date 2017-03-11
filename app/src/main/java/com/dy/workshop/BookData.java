@@ -18,22 +18,6 @@ public class BookData {
     this.mJsonObject = mJsonObject;
   }
 
-  public static String getCOUNT() {
-    return COUNT;
-  }
-
-  public static String getSTART() {
-    return START;
-  }
-
-  public static String getTOTAL() {
-    return TOTAL;
-  }
-
-  public static String getBOOKS() {
-    return BOOKS;
-  }
-
   public List<Book> getBooks() {
     JSONArray jsonArray = mJsonObject.optJSONArray(BOOKS);
     List<Book> books = new ArrayList<>(jsonArray.length());

@@ -3,10 +3,6 @@ package com.dy.workshop;
 import android.app.Application;
 import android.content.Context;
 
-/**
- * Created by yideng on 10/03/2017.
- */
-
 public class Workshop extends Application {
   private static Application instance;
 

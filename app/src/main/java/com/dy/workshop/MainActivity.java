@@ -16,7 +16,6 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
   private BookListAdapter mAdapter;
 
   private RecyclerView.LayoutManager mLayoutManager;
-  private SwipeRefreshLayout mSwipeRefreshLayout;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -31,9 +30,6 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
     mAdapter = new BookListAdapter();
     mRecyclerView.setAdapter(mAdapter);
-
-    mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
-    mSwipeRefreshLayout.setOnRefreshListener(this);
     doRefresh();
   }
 
@@ -47,7 +43,6 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
       @Override
       protected void onPostExecute(JSONObject jsonObject) {
         super.onPostExecute(jsonObject);
-        mSwipeRefreshLayout.setRefreshing(false);
         mAdapter.clearAll();
         mAdapter.addAll(new BookData(jsonObject).getBooks());
       }
