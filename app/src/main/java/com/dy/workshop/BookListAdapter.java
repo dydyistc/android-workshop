@@ -2,6 +2,7 @@ package com.dy.workshop;
 
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,7 +26,7 @@ public class BookListAdapter extends RecyclerView.Adapter {
   private boolean loading;
 
 
-  private List<Book> mBooks = new ArrayList<>();
+  private List<Book> books = new ArrayList<>();
   private OnLoadMoreListener onLoadMoreListener;
 
   public BookListAdapter(RecyclerView recyclerView) {
@@ -59,23 +60,17 @@ public class BookListAdapter extends RecyclerView.Adapter {
 
   }
 
-
-  public void addAll(List<Book> newBooks) {
-    mBooks.addAll(newBooks);
-    notifyDataSetChanged();
-  }
-
-  public void setmBooks(List<Book> mBooks) {
-    this.mBooks = mBooks;
+  public void setBooks(List<Book> books) {
+    this.books = books;
   }
 
   public void clearAll() {
-    mBooks.clear();
+    books.clear();
   }
 
   @Override
   public int getItemViewType(int position) {
-    return mBooks.get(position) != null ? VIEW_ITEM : VIEW_PROGRESS;
+    return books.get(position) != null ? VIEW_ITEM : VIEW_PROGRESS;
   }
 
   @Override
@@ -95,7 +90,7 @@ public class BookListAdapter extends RecyclerView.Adapter {
   @Override
   public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
     if (holder instanceof BookViewHolder) {
-      final Book data = mBooks.get(position);
+      final Book data = books.get(position);
       ((BookViewHolder) holder).title.setText(data.getTitle());
       ((BookViewHolder) holder).summary.setText(data.getSummary());
       ((BookViewHolder) holder).information.setText(data.getInformation());
@@ -116,7 +111,7 @@ public class BookListAdapter extends RecyclerView.Adapter {
 
   @Override
   public int getItemCount() {
-    return mBooks.size();
+    return books.size();
   }
 
   public void setOnLoadMoreListener(OnLoadMoreListener onLoadMoreListener) {
@@ -137,7 +132,12 @@ public class BookListAdapter extends RecyclerView.Adapter {
 
     public BookViewHolder(View v) {
       super(v);
-
+      v.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+          Log.d("test", "BIU BIU BIU!");
+        }
+      });
       title = (TextView) v.findViewById(R.id.title);
       information = (TextView) v.findViewById(R.id.information);
       summary = (TextView) v.findViewById(R.id.summary);
@@ -154,5 +154,9 @@ public class BookListAdapter extends RecyclerView.Adapter {
       super(v);
       progressBar = (ProgressBar) v.findViewById(R.id.progressBar);
     }
+  }
+
+  public interface OnLoadMoreListener {
+    void onLoadMore();
   }
 }

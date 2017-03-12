@@ -7,6 +7,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,9 +45,10 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     mRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
     mRefreshLayout.setOnRefreshListener(this);
 
-    mAdapter.setOnLoadMoreListener(new OnLoadMoreListener() {
+    mAdapter.setOnLoadMoreListener(new BookListAdapter.OnLoadMoreListener() {
       @Override
       public void onLoadMore() {
+        Log.d(TAG, "WoW! Has more!");
         mBooks.add(null);
         mAdapter.notifyItemInserted(mBooks.size() - 1);
 
@@ -55,11 +57,11 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
           protected void onPostExecute(BookData bookData) {
             super.onPostExecute(bookData);
             mBooks.remove(mBooks.size() - 1);
-            mAdapter.setmBooks(mBooks);
+            mAdapter.setBooks(mBooks);
             mAdapter.notifyItemRemoved(mBooks.size());
 
             mBooks.addAll(bookData.getBooks());
-            mAdapter.setmBooks(mBooks);
+            mAdapter.setBooks(mBooks);
             mAdapter.notifyDataSetChanged();
             mAdapter.setLoaded();
           }
@@ -94,7 +96,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         mRefreshLayout.setRefreshing(false);
         mAdapter.clearAll();
         mBooks.addAll(bookData.getBooks());
-        mAdapter.setmBooks(mBooks);
+        mAdapter.setBooks(mBooks);
         mAdapter.notifyDataSetChanged();
       }
     }.execute(getDataUrl(DATA_INITIAL_START));
