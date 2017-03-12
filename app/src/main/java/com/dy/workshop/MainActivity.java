@@ -5,9 +5,8 @@ import android.os.Bundle;
 import android.speech.tts.Voice;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,9 +23,8 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
   private BookListAdapter mAdapter;
   private List<Book> mBooks = new ArrayList<>();
 
-  private LinearLayoutManager mLayoutManager;
+  private GridLayoutManager mLayoutManager;
   private SwipeRefreshLayout mRefreshLayout;
-  private boolean isLoading;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -36,7 +34,8 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     mRecyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
     mRecyclerView.setHasFixedSize(true);
 
-    mLayoutManager = new LinearLayoutManager(this);
+    final int columns = getResources().getInteger(R.integer.gallery_columns);
+    mLayoutManager = new GridLayoutManager(Workshop.getApplication(), columns);
     mRecyclerView.setLayoutManager(mLayoutManager);
 
     mAdapter = new BookListAdapter(mRecyclerView);
@@ -71,24 +70,6 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     doRefresh();
   }
 
-  private void loadMoreData() {
-    Log.d(TAG, "Last Item Wow !");
-    new LoadDataTask() {
-      @Override
-      protected void onPreExecute() {
-        super.onPreExecute();
-        isLoading = true;
-      }
-
-      @Override
-      protected void onPostExecute(BookData bookData) {
-        super.onPostExecute(bookData);
-        isLoading = false;
-        mAdapter.addAll(bookData.getBooks());
-      }
-    }.execute(getDataUrl(mAdapter.getItemCount()));
-  }
-
   @Override
   public void onRefresh() {
     doRefresh();
@@ -99,17 +80,14 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
       @Override
       protected void onPreExecute() {
         super.onPreExecute();
-        isLoading = true;
         if (!mRefreshLayout.isRefreshing()) {
           mRefreshLayout.setRefreshing(true);
         }
-
       }
 
       @Override
       protected void onPostExecute(BookData bookData) {
         super.onPostExecute(bookData);
-        isLoading = false;
         if (mRefreshLayout.isRefreshing()) {
           mRefreshLayout.setRefreshing(false);
         }
