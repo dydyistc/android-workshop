@@ -9,6 +9,8 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
@@ -20,13 +22,11 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
   private RecyclerView mRecyclerView;
   private BookListAdapter mAdapter;
+  private List<Book> mBooks = new ArrayList<>();
 
   private LinearLayoutManager mLayoutManager;
   private SwipeRefreshLayout mRefreshLayout;
   private boolean isLoading;
-  private int visibleItemCount;
-  private int totalItemCount;
-  private int pastVisibleItems;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -39,26 +39,32 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     mLayoutManager = new LinearLayoutManager(this);
     mRecyclerView.setLayoutManager(mLayoutManager);
 
-    mAdapter = new BookListAdapter();
+    mAdapter = new BookListAdapter(mRecyclerView);
     mRecyclerView.setAdapter(mAdapter);
 
     mRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
     mRefreshLayout.setOnRefreshListener(this);
 
-    mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+    mAdapter.setOnLoadMoreListener(new OnLoadMoreListener() {
       @Override
-      public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-        if (dy > 0) {
-          visibleItemCount = mLayoutManager.getChildCount();
-          totalItemCount = mLayoutManager.getItemCount();
-          pastVisibleItems = mLayoutManager.findFirstVisibleItemPosition();
-          if (!isLoading) {
-            if ((visibleItemCount + pastVisibleItems) >= totalItemCount) {
-              isLoading = false;
-              loadMoreData();
-            }
+      public void onLoadMore() {
+        mBooks.add(null);
+        mAdapter.notifyItemInserted(mBooks.size() - 1);
+
+        new LoadDataTask() {
+          @Override
+          protected void onPostExecute(BookData bookData) {
+            super.onPostExecute(bookData);
+            mBooks.remove(mBooks.size() - 1);
+            mAdapter.setmBooks(mBooks);
+            mAdapter.notifyItemRemoved(mBooks.size());
+
+            mBooks.addAll(bookData.getBooks());
+            mAdapter.setmBooks(mBooks);
+            mAdapter.notifyDataSetChanged();
+            mAdapter.setLoaded();
           }
-        }
+        }.execute(getDataUrl(mAdapter.getItemCount()));
       }
     });
 
@@ -109,7 +115,9 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         }
         mRefreshLayout.setRefreshing(false);
         mAdapter.clearAll();
-        mAdapter.addAll(bookData.getBooks());
+        mBooks.addAll(bookData.getBooks());
+        mAdapter.setmBooks(mBooks);
+        mAdapter.notifyDataSetChanged();
       }
     }.execute(getDataUrl(DATA_INITIAL_START));
   }
